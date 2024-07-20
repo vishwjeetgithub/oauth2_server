@@ -10,8 +10,10 @@ TOKEN_PATH = 'http://localhost:5001/token'
 RES_PATH = 'http://localhost:5002/users'
 REDIRECT_URL = 'http://localhost:5000/callback'
 
-CLIENT_ID = 'sample-client-id'
+CLIENT_ID = 12345
 CLIENT_SECRET = 'sample-client-secret'
+
+ctr = 0
 
 app = Flask(__name__)
 
@@ -29,6 +31,9 @@ def before_request():
 def main():
   # Retrieves a list of users
   access_token = request.cookies.get('access_token')
+  
+  # Debug
+  print({'Authorization': 'Bearer {}'.format(access_token)})
 
   r = requests.get(RES_PATH, headers = {
     'Authorization': 'Bearer {}'.format(access_token)
@@ -47,15 +52,19 @@ def main():
 @app.route('/login')
 def login():
   # Presents the login page
-  return render_template('AC_login.html', 
+  return render_template('AC_login.html',
                          dest = AUTH_PATH,
                          client_id = CLIENT_ID,
                          redirect_url = REDIRECT_URL)
 
 @app.route('/callback')
 def callback():
+  global ctr
   # Accepts the authorization code and exchanges it for access token
   authorization_code = request.args.get('authorization_code')
+  
+  print(__name__," :: ", ctr)
+  ctr+=1
 
   if not authorization_code:
     return json.dumps({
@@ -70,12 +79,21 @@ def callback():
     "redirect_url": REDIRECT_URL
   })
   
+  print(__name__," :: ", ctr)
+  ctr+=1
+
+  print("Token response :: ",r)
+
   if r.status_code != 200:
     return json.dumps({
       'error': 'The authorization server returns an error: \n{}'.format(
         r.text)
     }), 500
   
+  print(__name__," :: ", ctr)
+  print("URL for main :: ", url_for('main'))
+  ctr+=1
+
   access_token = json.loads(r.text).get('access_token')
 
   response = make_response(redirect(url_for('main')))

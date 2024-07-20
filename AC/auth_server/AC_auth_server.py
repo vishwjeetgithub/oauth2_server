@@ -9,6 +9,8 @@ from auth import (authenticate_user_credentials, authenticate_client,
 from flask import Flask, redirect, render_template, request
 from urllib.parse import urlencode
 
+ctr = 0
+
 app = Flask(__name__)
 
 @app.route('/auth')
@@ -57,7 +59,7 @@ def signin():
     return json.dumps({
       "error": "invalid_client"
     })
-
+  print("server : username :: ", username, type(username))
   if not authenticate_user_credentials(username, password):
     return json.dumps({
       'error': 'access_denied'
@@ -71,6 +73,9 @@ def signin():
 
 @app.route('/token', methods = ['POST'])
 def exchange_for_token():
+  
+  global ctr
+
   # Issues access token
   authorization_code = request.form.get('authorization_code')
   client_id = request.form.get('client_id')
@@ -91,11 +96,20 @@ def exchange_for_token():
     return json.dumps({
       "error": "access_denied"
     }), 400
-
+ 
+  print(__name__," :: ", ctr)
+  ctr+=1
+ 
   access_token = generate_access_token()
-  
+
+  print(__name__," :: ", ctr)
+  print("token_type","JWT","expires_in",JWT_LIFE_SPAN)
+  print("access_token :: ", access_token)
+  # print("access_token :: ", access_token.decode())
+  ctr+=1
+
   return json.dumps({ 
-    "access_token": access_token.decode(),
+    "access_token": access_token,
     "token_type": "JWT",
     "expires_in": JWT_LIFE_SPAN
   })

@@ -4,6 +4,7 @@ import json
 import jwt
 import secrets
 import time
+import config as config
 
 from cryptography.fernet import Fernet
 
@@ -22,13 +23,28 @@ with open('private.pem', 'rb') as file:
   private_key = file.read()
 
 def authenticate_user_credentials(username, password):
-  return True
+  df_users = config.df_users
+  df_user_row = df_users[df_users['user']==int(username)]
+  print("user iloc :: ",df_user_row.iloc[0,0],"password iloc :: ",df_user_row.iloc[0,1])
+  if (df_user_row.iloc[0,0] == int(username) and df_user_row.iloc[0,1] == password):
+    return True
+  else:
+    return False
 
 def authenticate_client(client_id, client_secret):
   return True
 
 def verify_client_info(client_id, redirect_url):
-  return True
+  print("entered client info verification")
+  df_client_id_sec = config.df_client_id_sec
+  df_client_id_sec_row = df_client_id_sec[df_client_id_sec['client_id']==int(client_id)]
+   #  and df_client_id_sec_row.iloc[0,0] == int(client_id)
+  if (len(df_client_id_sec_row.index)>0):
+    print("cliend_id iloc :: ",df_client_id_sec_row.iloc[0,0],"client_secret iloc :: ",df_client_id_sec_row.iloc[0,1], " :: ",len(df_client_id_sec_row.index))
+    return True
+  else:
+    print("client id not found")
+    return False
 
 def generate_access_token():
   payload = {
@@ -50,13 +66,15 @@ def generate_authorization_code(client_id, redirect_url):
   authorization_code = base64.b64encode(authorization_code, b'-_').decode().replace('=', '')
 
   expiration_date = time.time() + CODE_LIFE_SPAN
-
+  
+  global authorization_codes
+  
   authorization_codes[authorization_code] = {
     "client_id": client_id,
     "redirect_url": redirect_url,
     "exp": expiration_date
   }
-
+  print("Authorization codes :: ", authorization_codes," :: length of auth codes dict :: ", len(authorization_codes), type(authorization_codes))
   return authorization_code
 
 def verify_authorization_code(authorization_code, client_id, redirect_url):

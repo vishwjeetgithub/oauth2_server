@@ -10,11 +10,12 @@ def verify_access_token(access_token):
   try:
     decoded_token = jwt.decode(access_token, public_key,
                                issuer = ISSUER,
-                               algorithm = 'RS256')
+                               algorithms = ['RS256'])
   except (jwt.exceptions.InvalidTokenError,
           jwt.exceptions.InvalidSignatureError,
           jwt.exceptions.InvalidIssuerError,
-          jwt.exceptions.ExpiredSignatureError):
+          jwt.exceptions.ExpiredSignatureError) as e:
+    print(e)
     return False
-
+  # print("Decoded token ::",decoded_token)
   return True

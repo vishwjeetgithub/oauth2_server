@@ -17,6 +17,9 @@ def before_request():
   
   access_token = auth_header[7:]
 
+  # Debug
+  print("Access token in API server :: ", access_token)
+
   if access_token and verify_access_token(access_token):
       pass
   else:
