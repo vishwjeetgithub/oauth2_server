@@ -2,6 +2,13 @@
 
 This repository holds the samples for Understanding OAuth2 and Building a Basic Authorization Server of Your Own Beginner's Guide. See the guide for instructions on using these samples.
 
+
+## Dependencies
+## Authlib - pip install Authlib
+## $ pip install Authlib requests
+## $ pip install Authlib Flask
+
+
 How the whole cycle works
 
 Login cycle

@@ -5,9 +5,10 @@ import urllib.parse as urlparse
 from auth import (authenticate_user_credentials, authenticate_client,
                   generate_access_token, generate_authorization_code, 
                   verify_authorization_code, verify_client_info,
-                  JWT_LIFE_SPAN)
+                  JWT_LIFE_SPAN, ENCRYPT_ALGO)
 from flask import Flask, redirect, render_template, request
 from urllib.parse import urlencode
+import jwt
 
 ctr = 0
 
@@ -59,7 +60,8 @@ def signin():
     return json.dumps({
       "error": "invalid_client"
     })
-  print("server : username :: ", username, type(username))
+  # Debug
+  # print("server : username :: ", username, type(username))
   if not authenticate_user_credentials(username, password):
     return json.dumps({
       'error': 'access_denied'
@@ -68,6 +70,7 @@ def signin():
   authorization_code = generate_authorization_code(client_id, redirect_url)
 
   url = process_redirect_url(redirect_url, authorization_code)
+  # Goes to client Callback URL with the authorization code
 
   return redirect(url, code = 303)
 
@@ -91,7 +94,8 @@ def exchange_for_token():
     return json.dumps({
       "error": "invalid_client"
     }), 400
-
+  # Debug
+  # print("Authorizaton code for postman :: ", authorization_code)
   if not verify_authorization_code(authorization_code, client_id, redirect_url):
     return json.dumps({
       "error": "access_denied"
@@ -101,13 +105,10 @@ def exchange_for_token():
   ctr+=1
  
   access_token = generate_access_token()
-
-  print(__name__," :: ", ctr)
-  print("token_type","JWT","expires_in",JWT_LIFE_SPAN)
-  print("access_token :: ", access_token)
-  # print("access_token :: ", access_token.decode())
-  ctr+=1
-
+  # Debug
+  # print(__name__," :: ", ctr)
+  # print("token_type","JWT","expires_in",JWT_LIFE_SPAN)
+  # print("access_token :: ", access_token)
   return json.dumps({ 
     "access_token": access_token,
     "token_type": "JWT",

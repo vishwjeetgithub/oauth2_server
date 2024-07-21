@@ -11,7 +11,7 @@ RES_PATH = 'http://localhost:5002/users'
 REDIRECT_URL = 'http://localhost:5000/callback'
 
 CLIENT_ID = 12345
-CLIENT_SECRET = 'sample-client-secret'
+CLIENT_SECRET = '88kjjhhsggdJJH##$'
 
 ctr = 0
 
@@ -33,7 +33,7 @@ def main():
   access_token = request.cookies.get('access_token')
   
   # Debug
-  print({'Authorization': 'Bearer {}'.format(access_token)})
+  # print({'Authorization': 'Bearer {}'.format(access_token)})
 
   r = requests.get(RES_PATH, headers = {
     'Authorization': 'Bearer {}'.format(access_token)
@@ -59,12 +59,14 @@ def login():
 
 @app.route('/callback')
 def callback():
+  # After receiving authorization code, fetch ACCESS Token
   global ctr
   # Accepts the authorization code and exchanges it for access token
   authorization_code = request.args.get('authorization_code')
-  
-  print(__name__," :: ", ctr)
-  ctr+=1
+
+  # Debug 
+  # print(__name__," :: ", ctr)
+  # ctr+=1
 
   if not authorization_code:
     return json.dumps({
@@ -79,10 +81,10 @@ def callback():
     "redirect_url": REDIRECT_URL
   })
   
-  print(__name__," :: ", ctr)
+  print(__name__," client callback :: ", ctr)
   ctr+=1
-
-  print("Token response :: ",r)
+  # Debug
+  # print("Token response :: ",r)
 
   if r.status_code != 200:
     return json.dumps({
@@ -90,8 +92,9 @@ def callback():
         r.text)
     }), 500
   
-  print(__name__," :: ", ctr)
-  print("URL for main :: ", url_for('main'))
+  # Debug
+  # print(__name__," :: ", ctr)
+  # print("URL for main :: ", url_for('main'))
   ctr+=1
 
   access_token = json.loads(r.text).get('access_token')

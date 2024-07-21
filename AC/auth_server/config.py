@@ -1,6 +1,5 @@
 # Required for dummy db
-
-# Client sercretes
+# Client secretes
 import pandas as pd
 
 ## Create dummy db
