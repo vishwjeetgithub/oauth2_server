@@ -52,3 +52,10 @@ Rest API
 2. Route to main (/) 5000 (client app)(The core rest api call that we wanted to do)
         Fetch access_token from cookie
         Get request to the API resource. Pass bearer access_token in header
+
+Access Token
+======================================
+Access token itself is not encrypted. Following function tries to validate the token, by matching the signature. In case token is tampered it throws an exception
+jwt.decode(access_token, public_key,
+                               issuer = ISSUER,
+                               algorithms = ['RS256'])

@@ -17,5 +17,6 @@ def verify_access_token(access_token):
           jwt.exceptions.ExpiredSignatureError) as e:
     print(e)
     return False
+  print("Encoded token ::",access_token)
   print("Decoded token ::",decoded_token)
   return True
