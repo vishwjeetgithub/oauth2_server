@@ -59,3 +59,33 @@ Access token itself is not encrypted. Following function tries to validate the t
 jwt.decode(access_token, public_key,
                                issuer = ISSUER,
                                algorithms = ['RS256'])
+
+How to securely store JWTs in a cookie
+======================================
+A JWT needs to be stored in a safe place inside the user’s browser. We already established that storing sensitive data inside localStorage is a bad idea. To reiterate, whatever you do, don’t store a JWT in localStorage (or sessionStorage). If any of the third-party scripts you include in your page are compromised, it can access all your users’ tokens.
+
+To keep them secure, you should always store JWTs inside an HttpOnly cookie. This is a special kind of cookie that’s only sent in HTTP requests to the server. It’s never accessible (both for reading and writing) from JavaScript running in the browser.
+
+
+HTTP has different verbs, which have different semantics:
+======================================
+
+GET : does not change anything server side, multiple GET with same parameters should get same response - typically get an account value
+POST : can make changes server side, multiple POST with same parameters can lead to different results and responses - typically add an amount to an account
+PUT : can make changes server side, multiple PUT with same parameters should lead to same result and response - typically set an account value
+
+As POST is not idempotent, major browser will warn you if you send twice the same POST request which is not desirable in GET use cases.
+Anyway, headers in the HTTP request control where the response should be cached or not, so it is possible to ask caches to not keep responses to GET requests.
+
+Browser caching is a different question, because then can store the last URLs in their history cache. So sensitive information should not be send in the URL, unless you consistently clean the history when you close you browser, and close your browser when you have finished browsing a site. But sent in URL and sent in a GET request are different questions.
+
+Post request will reload the page
+
+One factor to consider is that GET requests can be cached, but POST requests are never cached. Some data doesn't change frequently. Some changes rarely.
+Requests can be cached in various ways - by the browser, by the server, and by CDNs. All of these result in faster response times and reduced load on the server
+
+Why is using a HTTP GET to update state on the server in a RESTful call incorrect?
+======================================
+The practical case where you will have a problem is that the HTTP GET is often retried in the event of a failure by the HTTP implementation. So you can in real life get situations where the same GET is received multiple times by the server. If your update is idempotent (which yours is), then there will be no problem, but if it's not idempotent (like adding some value to an amount for example), then you could get multiple (undesired) updates.
+
+HTTP POST is never retried, so you would never have this problem
