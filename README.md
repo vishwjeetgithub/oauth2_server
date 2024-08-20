@@ -89,3 +89,5 @@ Why is using a HTTP GET to update state on the server in a RESTful call incorrec
 The practical case where you will have a problem is that the HTTP GET is often retried in the event of a failure by the HTTP implementation. So you can in real life get situations where the same GET is received multiple times by the server. If your update is idempotent (which yours is), then there will be no problem, but if it's not idempotent (like adding some value to an amount for example), then you could get multiple (undesired) updates.
 
 HTTP POST is never retried, so you would never have this problem
+
+While technically you can send a body with a GET request, it is not standard practice and is generally discouraged. The HTTP specification does not define semantics for a body in a GET request, and many servers and proxies do not handle it properly. For retrieving data, rely on query parameters and URL paths.
